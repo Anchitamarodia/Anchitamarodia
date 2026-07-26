@@ -24,6 +24,7 @@ jobs:
 
       - name: Slow down the snake
         run: |
+          sudo chmod -R a+rw dist
           python3 - <<'EOF'
           import re, glob
 
