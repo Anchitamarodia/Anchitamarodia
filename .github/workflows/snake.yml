@@ -2,8 +2,8 @@ name: Generate Snake Animation
 
 on:
   schedule:
-    - cron: "0 0 * * *"
-  workflow_dispatch:
+    - cron: "0 0 * * *"   # runs once a day
+  workflow_dispatch:       # lets you trigger it manually
   push:
     branches:
       - main
@@ -21,6 +21,25 @@ jobs:
           outputs: |
             dist/github-contribution-grid-snake.svg
             dist/github-contribution-grid-snake-dark.svg?palette=github-dark
+
+      - name: Slow down the snake
+        run: |
+          python3 - <<'EOF'
+          import re, glob
+
+          SPEED_FACTOR = 2  # 2 = twice as slow. Try 3 or 4 for even slower.
+
+          for path in glob.glob('dist/*.svg'):
+              with open(path) as f:
+                  content = f.read()
+              content = re.sub(
+                  r'animation:none (\d+)ms',
+                  lambda m: f'animation:none {int(m.group(1)) * SPEED_FACTOR}ms',
+                  content
+              )
+              with open(path, 'w') as f:
+                  f.write(content)
+          EOF
 
       - name: Push snake svg to output branch
         uses: crazy-max/ghaction-github-pages@v4
